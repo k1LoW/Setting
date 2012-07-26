@@ -1,11 +1,36 @@
 <?php
 App::uses('Cache', 'Cache');
 App::uses('Setting', 'Setting.Model');
+
+class Setting extends CakeTestModel {
+    public $displayField = 'key';
+
+    public $actsAs = array('Setting.Settable');
+
+    /**
+     * setSetting
+     *
+     */
+    public static function setSetting($key, $value = null){
+        $setting = ClassRegistry::init('Setting');
+        return SettableBehavior::setSetting($setting, $key, $value);
+    }
+
+    /**
+     * getSetting
+     *
+     */
+    public static function getSetting($key = null, $force = false){
+        $setting = ClassRegistry::init('Setting');
+        return SettableBehavior::getSetting($setting, $key, $force);
+    }
+}
+
 class SettingTestCase extends CakeTestCase {
 
     public $fixtures = array('plugin.Setting.setting');
 
-    function setUp() {
+    public function setUp() {
         $this->_cacheDisable = Configure::read('Cache.disable');
         Configure::write('Cache.disable', false);
         $this->_defaultCacheConfig = Cache::config('default');
@@ -15,8 +40,9 @@ class SettingTestCase extends CakeTestCase {
         Configure::write('Setting.prefix', 'test');
     }
 
-    function tearDown() {
+    public function tearDown() {
         Cache::delete('test' . 'Setting.cache');
+        Cache::clear();
         Configure::write('Cache.disable', $this->_cacheDisable);
         Cache::config('default', $this->_defaultCacheConfig['settings']);
     }
@@ -56,7 +82,7 @@ class SettingTestCase extends CakeTestCase {
                                                    'tax_rate' => array('rule' => array('numeric')),
                                                    ));
         $result = Setting::setSetting('tax_rate', 0.05);
-        //$this->assertTrue($result);
+        $this->assertTrue($result);
 
         // jpn: DB側の値を直接変更してしまう(本来はしない処理)
         $setting = $this->Setting->find('first', array('conditions' => array('Setting.key' => 'tax_rate')));
@@ -97,5 +123,35 @@ class SettingTestCase extends CakeTestCase {
         // jpn: 第2引数を設定し、強引にDBを見に行く
         $result = Setting::getSetting('tax_rate', true);
         $this->assertIdentical((float)$result, 0.10);
+    }
+
+    /**
+     * testGetSettingAll
+     *
+     */
+    public function testGetSettingAll(){
+        Configure::write('Setting.settings', array(
+                                                   'tax_rate' => array('rule' => array('numeric')),
+                                                   'tax_flg' => array('rule' => '/^[01]$/'),
+                                                   ));
+        $result = Setting::getSetting();
+        $expect = array('tax_rate' => null,
+                        'tax_flg' => null);
+        $this->assertIdentical($result, $expect);
+        $result = Setting::setSetting('tax_rate', 0.05);
+        $this->assertTrue($result);
+
+        $result = Setting::getSetting();
+        $expect = array('tax_rate' => '0.05',
+                        'tax_flg' => null);
+        $this->assertIdentical($result, $expect);
+
+        $result = Setting::setSetting('tax_flg', true);
+        $this->assertTrue($result);
+
+        $result = Setting::getSetting();
+        $expect = array('tax_rate' => '0.05',
+                        'tax_flg' => '1');
+        $this->assertIdentical($result, $expect);
     }
 }
