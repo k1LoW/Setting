@@ -22,7 +22,11 @@ class SettingTestCase extends CakeTestCase {
         Configure::write('Setting.settings', array(
                                                    'tax_rate' => array('rule' => array('numeric')),
                                                    ));
-        Setting::setSetting('tax_rate', 0.05);
+        $result = Setting::setSetting('tax_rate', 0.05);
+        $this->assertTrue($result);
+
+        $this->assertTrue(file_exists(CACHE . 'cake_test_setting_cache'));
+
         $result = Setting::getSetting('tax_rate');
         $this->assertIdentical($result, '0.05');
     }
@@ -35,7 +39,8 @@ class SettingTestCase extends CakeTestCase {
         Configure::write('Setting.settings', array(
                                                    'tax_rate' => array('rule' => array('numeric')),
                                                    ));
-        Setting::setSetting('tax_rate', 0.05);
+        $result = Setting::setSetting('tax_rate', 0.05);
+        $this->assertTrue($result);
 
         // jpn: DB側の値を直接変更してしまう(本来はしない処理)
         $setting = $this->Setting->find('first', array('conditions' => array('Setting.key' => 'tax_rate')));
