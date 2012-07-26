@@ -30,4 +30,5 @@ script:
   - ./lib/Cake/Console/cake test Setting Model/Setting --stderr
 
 after_script:
-  - rm -rf ../
+  - cd ../
+  - rm -rf *
