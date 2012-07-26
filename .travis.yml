@@ -21,7 +21,7 @@ before_script:
     App::build(array(
     'Plugin' => array('/home/vagrant/builds/k1LoW/'),
     ));
-    CakePlugin::loadAll();
+    CakePlugin::load('Setting' => array('bootstrap' => true));
     " > cakephp/app/Config/bootstrap.php
   - mv Test/database.php cakephp/app/Config/database.php
   - cd ./cakephp
