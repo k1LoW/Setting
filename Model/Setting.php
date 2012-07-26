@@ -14,10 +14,11 @@ class Setting extends AppModel {
      */
     public static function setSetting($key, $value = null){
         $setting = ClassRegistry::init('Setting');
+        $prefix = Configure::read('Setting.prefix');
         if (!$setting->setSettingToDatasource($key, $value)) {
             return false;
         }
-        return Cache::write('Setting.cache', $setting->getSettingFromDatasource());
+        return Cache::write($prefix . 'Setting.cache', $setting->getSettingFromDatasource());
     }
 
     /**
@@ -25,15 +26,16 @@ class Setting extends AppModel {
      *
      */
     public static function getSetting($key = null, $force = false){
+        $prefix = Configure::read('Setting.prefix');
         if ($force) {
             $setting = ClassRegistry::init('Setting');
             return $setting->getSettingFromDatasource($key);
         }
-        $cache = Cache::read('Setting.cache');
+        $cache = Cache::read($prefix . 'Setting.cache');
         if ($cache === false) {
             $setting = ClassRegistry::init('Setting');
-            Cache::write('Setting.cache', $setting->getSettingFromDatasource());
-            $cache = Cache::read('Setting.cache');
+            Cache::write($prefix . 'Setting.cache', $setting->getSettingFromDatasource());
+            $cache = Cache::read($prefix . 'Setting.cache');
         }
         if ($cache) {
             $settings = Configure::read('Setting.settings');
@@ -75,6 +77,10 @@ class Setting extends AppModel {
         }
         $this->begin();
         foreach ($data as $k => $v) {
+            if (is_array($v) || is_object($v)) {
+                $this->rollback();
+                return false;
+            }
             if (in_array($k, array_keys($settings))) {
                 $d = $this->find('first', array('conditions' => array('Setting.key' => $k)));
                 if (empty($d)) {
