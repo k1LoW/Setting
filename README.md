@@ -10,6 +10,15 @@ Second, Create schema.
 
 ## Usage
 
+### Init
+
+Configure `Setting.settings` like Model::validate.
+
+    Configure::write('Setting.settings', array(
+                                               'tax_rate' => array('rule' => array('numeric')),
+                                               ));
+
+
 ### Set setting
 
 `Setting::setSetting([key], [value])` or `Setting::setSetting(array([key1] => [value1], [key2] => [value2]))`
