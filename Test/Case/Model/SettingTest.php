@@ -26,6 +26,7 @@ class SettingTestCase extends CakeTestCase {
         $result = Setting::setSetting('tax_rate', 0.05);
         //$this->assertTrue($result);
 
+        $this->assertTrue(is_writable(CACHE));
         $this->assertTrue(file_exists(CACHE . 'cake_test_setting_cache'));
 
         $result = Setting::getSetting('tax_rate');
