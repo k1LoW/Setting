@@ -1,5 +1,5 @@
 <?php
-
+App::uses('Cache', 'Cache');
 App::uses('Setting', 'Setting.Model');
 class SettingTestCase extends CakeTestCase {
 
@@ -7,6 +7,7 @@ class SettingTestCase extends CakeTestCase {
 
     function setUp() {
         $this->Setting = new Setting();
+        Configure::write('Cache.disable', false);
         Configure::write('Setting.prefix', 'test');
     }
 
