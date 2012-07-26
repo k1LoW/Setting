@@ -74,6 +74,30 @@ class SettingTestCase extends CakeTestCase {
     }
 
     /**
+     * testInvalidKeySetSetting
+     *
+     */
+    public function testInvalidKeySetSetting(){
+        Configure::write('Setting.settings', array(
+                                                   'tax_rate' => array('rule' => array('numeric')),
+                                                   ));
+        $result = Setting::setSetting('invalid_key', 0.05);
+        $this->assertFalse($result);
+    }
+
+    /**
+     * testInvalidValueSetSetting
+     *
+     */
+    public function testInvalidValueSetSetting(){
+        Configure::write('Setting.settings', array(
+                                                   'tax_rate' => array('rule' => array('numeric')),
+                                                   ));
+        $result = Setting::setSetting('tax_rate', 'invalid_value');
+        $this->assertFalse($result);
+    }
+
+    /**
      * testGetSettingFromCache
      *
      */

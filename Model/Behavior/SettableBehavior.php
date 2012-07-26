@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 
+ *
  *
  *
  * @params
@@ -74,6 +74,11 @@ class SettableBehavior extends ModelBehavior {
         $model->set($data);
         if(!$model->validates()) {
             return false;
+        }
+        foreach ($data as $k => $v) {
+            if (!in_array($k, array_keys($settings))) {
+                return false;
+            }
         }
         $model->begin();
         foreach ($data as $k => $v) {
