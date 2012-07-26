@@ -27,4 +27,4 @@ before_script:
   - cd ./cakephp
 
 script:
-  - ./lib/Cake/Console/cake test Setting Model/Setting --stderr
+  - ./lib/Cake/Console/cake test core Cache/Cache
