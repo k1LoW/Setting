@@ -18,10 +18,10 @@ class SettingTestCase extends CakeTestCase {
     /**
      * testCache
      *
-     * @param 
      */
     public function testCache(){
-        Cache::write('hoge', 'fuga');
+        $result = Cache::write('hoge', 'fuga');
+        $this->assertTrue($result);
         $result = Cache::read('hoge');
         $this->assertIdentical($result, 'fuga');
     }
