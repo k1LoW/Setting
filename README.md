@@ -1,5 +1,7 @@
 # Setting: Database driven setting plugin for CakePHP.
 
+[![Build Status](https://secure.travis-ci.org/k1LoW/Setting.png?branch=master)](http://travis-ci.org/k1LoW/Setting)
+
 ## Install
 
 First, Install 'Setting' by [recipe.php](https://github.com/k1LoW/recipe) , and set `CakePlugin::load('Setting', array('bootstrap' => true));`
