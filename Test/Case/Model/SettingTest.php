@@ -6,13 +6,19 @@ class SettingTestCase extends CakeTestCase {
     public $fixtures = array('plugin.Setting.setting');
 
     function setUp() {
-        $this->Setting = new Setting();
+        $this->_cacheDisable = Configure::read('Cache.disable');
         Configure::write('Cache.disable', false);
+        $this->_defaultCacheConfig = Cache::config('default');
+        Cache::config('default', array('engine' => 'File', 'path' => TMP . 'tests'));
+
+        $this->Setting = new Setting();
         Configure::write('Setting.prefix', 'test');
     }
 
     function tearDown() {
         Cache::delete('test' . 'Setting.cache');
+        Configure::write('Cache.disable', $this->_cacheDisable);
+        Cache::config('default', $this->_defaultCacheConfig['settings']);
     }
 
     /**
@@ -35,10 +41,10 @@ class SettingTestCase extends CakeTestCase {
                                                    'tax_rate' => array('rule' => array('numeric')),
                                                    ));
         $result = Setting::setSetting('tax_rate', 0.05);
-        //$this->assertTrue($result);
+        $this->assertTrue($result);
 
-        $this->assertTrue(is_writable(CACHE));
-        $this->assertTrue(file_exists(CACHE . 'cake_test_setting_cache'));
+        //$this->assertTrue(is_writable(CACHE));
+        //$this->assertTrue(file_exists(CACHE . 'cake_test_setting_cache'));
 
         $result = Setting::getSetting('tax_rate');
         $this->assertIdentical($result, '0.05');
