@@ -10,6 +10,7 @@ env:
   - DB=pgsql CAKEPHP=2.2.1
 
 before_script:
+  - rm -rf ./Setting
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test;'; fi"
   - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'CREATE DATABASE cakephp_test;' -U postgres; fi"
   - wget https://github.com/cakephp/cakephp/tarball/$CAKEPHP -O cake.tar.gz
