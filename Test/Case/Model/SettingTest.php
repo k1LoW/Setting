@@ -16,6 +16,17 @@ class SettingTestCase extends CakeTestCase {
     }
 
     /**
+     * testCache
+     *
+     * @param 
+     */
+    public function testCache(){
+        Cache::write('hoge', 'fuga');
+        $result = Cache::read('hoge');
+        $this->assertIdentical($result, 'fuga');
+    }
+
+    /**
      * testSetSetting
      *
      */
