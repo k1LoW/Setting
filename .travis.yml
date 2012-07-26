@@ -30,4 +30,4 @@ script:
   - ./lib/Cake/Console/cake test Setting Model/Setting --stderr
 
 after_script:
-  - rm -rf /home/vagrant/builds/k1LoW/Setting
+  - rm -rf ../
