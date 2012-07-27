@@ -61,6 +61,7 @@ class SettingTestCase extends CakeTestCase {
     /**
      * testSetSetting
      *
+     * jpn: 設定をkey-value形式で保存できる
      */
     public function testSetSetting(){
         Configure::write('Setting.settings', array(
@@ -74,8 +75,30 @@ class SettingTestCase extends CakeTestCase {
     }
 
     /**
+     * testSetSettingMulti
+     *
+     * jpn: 複数の設定を一括して設定することが可能
+     */
+    public function testSetSettingMulti(){
+        Configure::write('Setting.settings', array(
+                                                   'tax_rate' => array('rule' => array('numeric')),
+                                                   'tax_flg' => array('rule' => '/^[01]$/'),
+                                                   ));
+        $result = Setting::setSetting(array('tax_rate' => 0.05,
+                                            'tax_flg' => 1));
+        $this->assertTrue($result);
+
+        $result = Setting::getSetting('tax_rate');
+        $this->assertIdentical($result, '0.05');
+
+        $result = Setting::getSetting('tax_flg');
+        $this->assertIdentical($result, '1');
+    }
+
+    /**
      * testInvalidKeySetSetting
      *
+     * jpn: Setting.settingsで設定していないキーの設定はfalse
      */
     public function testInvalidKeySetSetting(){
         Configure::write('Setting.settings', array(
@@ -88,6 +111,7 @@ class SettingTestCase extends CakeTestCase {
     /**
      * testInvalidValueSetSetting
      *
+     * jpn: Setting.settingsで設定していないバリデーションにマッチしない場合はfalse
      */
     public function testInvalidValueSetSetting(){
         Configure::write('Setting.settings', array(
@@ -100,6 +124,7 @@ class SettingTestCase extends CakeTestCase {
     /**
      * testGetSettingFromCache
      *
+     * jpn: Setting::getSetting()は通常はキャッシュを優先して参照する
      */
     public function testGetSettingFromCache(){
         Configure::write('Setting.settings', array(
@@ -130,6 +155,7 @@ class SettingTestCase extends CakeTestCase {
     /**
      * testGetSettingFromDatasource
      *
+     * jpn: Setting::getSetting()の第2引数をtrueにするとDatasourceを優先して参照する
      */
     public function testGetSettingFromDatasource(){
         Configure::write('Setting.settings', array(
@@ -152,12 +178,14 @@ class SettingTestCase extends CakeTestCase {
     /**
      * testGetSettingAll
      *
+     * jpn: Setting::getSetting()を引数なしで使用した場合、全ての設定を返す
      */
     public function testGetSettingAll(){
         Configure::write('Setting.settings', array(
                                                    'tax_rate' => array('rule' => array('numeric')),
                                                    'tax_flg' => array('rule' => '/^[01]$/'),
                                                    ));
+        // jpn: keyに対してvalueがない場合はnullを返す
         $result = Setting::getSetting();
         $expect = array('tax_rate' => null,
                         'tax_flg' => null);
