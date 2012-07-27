@@ -114,15 +114,27 @@ class SettableBehavior extends ModelBehavior {
      */
     public function getSettingFromDatasource(Model $model, $key = null){
         $settings = Configure::read('Setting.settings');
+        $prefix = Configure::read('Setting.prefix');
         if ($key === null) {
             $s = $model->find('all');
             if (empty($s)) {
-                return array_combine(array_keys($settings), array_fill(0, count($settings), null));
+                $result = array_combine(array_keys($settings), array_fill(0, count($settings), null));
+                foreach ($result as $key => $value) {
+                    if (array_key_exists('default', $settings[$key])) {
+                        $result[$key] = (string)$settings[$key]['default'];
+                        self::setSetting($model, $key, $settings[$key]['default']);
+                    }
+                }
+                return $result;
             }
         } else {
             $keys = array_intersect((array)$key, array_keys($settings));
             $s = $model->find('all', array('conditions' => array('Setting.key' => $keys)));
             if (empty($s)) {
+                if (array_key_exists('default', $settings[$key])) {
+                    self::setSetting($model, $key, $settings[$key]['default']);
+                    return (string)$settings[$key]['default'];
+                }
                 return null;
             }
         }

@@ -190,9 +190,9 @@ class SettingTestCase extends CakeTestCase {
         $expect = array('tax_rate' => null,
                         'tax_flg' => null);
         $this->assertIdentical($result, $expect);
+
         $result = Setting::setSetting('tax_rate', 0.05);
         $this->assertTrue($result);
-
         $result = Setting::getSetting();
         $expect = array('tax_rate' => '0.05',
                         'tax_flg' => null);
@@ -205,5 +205,25 @@ class SettingTestCase extends CakeTestCase {
         $expect = array('tax_rate' => '0.05',
                         'tax_flg' => '1');
         $this->assertIdentical($result, $expect);
+    }
+
+    /**
+     * testGetSettingDefault
+     *
+     * jpn: Setting.settingsに`default`パラメータがあって、
+     *      キャッシュ、Datasourceにデータがない場合はnullの代わりにそれを返して
+     *      Datasourceにそれを設定する
+     */
+    public function testGetSettingDefault(){
+        Configure::write('Setting.settings', array(
+                                                   'tax_rate' => array('rule' => array('numeric'),
+                                                                       'default' => 0.03),
+                                                   ));
+        $result = Setting::getSetting('tax_rate');
+        $this->assertIdentical($result, '0.03');
+        $result = Setting::setSetting('tax_rate', 0.05);
+        $this->assertTrue($result);
+        $result = Setting::getSetting('tax_rate');
+        $this->assertIdentical($result, '0.05');
     }
 }
