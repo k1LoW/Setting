@@ -225,5 +225,9 @@ class SettingTestCase extends CakeTestCase {
         $this->assertTrue($result);
         $result = Setting::getSetting('tax_rate');
         $this->assertIdentical($result, '0.05');
+
+        Cache::delete('test' . 'Setting.cache');
+        $result = Setting::getSetting('tax_rate');
+        $this->assertIdentical($result, '0.05');
     }
 }
