@@ -29,6 +29,10 @@ Configure `Setting.settings` like Model::validate.
 
 `Setting::getSetting([key])` or `Setting::getSetting()`
 
+## If you want not to use Setting (settings table)
+
+See [SystemControlTest.php](https://github.com/k1LoW/Setting/blob/master/Test/Case/Model/SystemControlTest.php).
+
 ## License
 
 the MIT License
