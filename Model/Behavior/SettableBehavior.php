@@ -87,13 +87,13 @@ class SettableBehavior extends ModelBehavior {
                 return false;
             }
             if (in_array($k, array_keys($settings))) {
-                $d = $model->find('first', array('conditions' => array('Setting.key' => $k)));
+                $d = $model->find('first', array('conditions' => array("{$model->alias}.key" => $k)));
                 if (empty($d)) {
-                    $d = array('Setting' => array('key' => $k,
-                                                  'value' => $v));
+                    $d = array($model->alias => array('key' => $k,
+                                                      'value' => $v));
                 } else {
-                    $d['Setting']['value'] = $v;
-                    unset($d['Setting']['modified']);
+                    $d[$model->alias]['value'] = $v;
+                    unset($d[$model->alias]['modified']);
                 }
                 $model->create();
                 $model->set($d);
@@ -129,7 +129,7 @@ class SettableBehavior extends ModelBehavior {
             }
         } else {
             $keys = array_intersect((array)$key, array_keys($settings));
-            $s = $model->find('all', array('conditions' => array('Setting.key' => $keys)));
+            $s = $model->find('all', array('conditions' => array("{$model->alias}.key" => $keys)));
             if (empty($s)) {
                 if (array_key_exists('default', $settings[$key])) {
                     self::setSetting($model, $key, $settings[$key]['default']);
@@ -140,7 +140,7 @@ class SettableBehavior extends ModelBehavior {
         }
         $keys = array();
         foreach ($s as $d) {
-            $keys[$d['Setting']['key']] = $d['Setting']['value'];
+            $keys[$d[$model->alias]['key']] = $d[$model->alias]['value'];
         }
         if ($key !== null && count($keys) === 1) {
             return array_shift($keys);
@@ -155,12 +155,12 @@ class SettableBehavior extends ModelBehavior {
      */
     public function deleteSetting(Model $model, $key){
         $keys = array_intersect((array)$key, array_keys($settings));
-        $s = $model->find('all', array('conditions' => array('Setting.key' => $keys)));
+        $s = $model->find('all', array('conditions' => array("{$model->alias}.key" => $keys)));
         if (empty($s)) {
             return true;
         }
         foreach ($s as $d) {
-            if (!$model->delete($d['Setting']['id'])) {
+            if (!$model->delete($d[$model->alias]['id'])) {
                 return false;
             }
         }
