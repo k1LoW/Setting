@@ -1,7 +1,4 @@
 <?php
-App::uses('Cache', 'Cache');
-App::uses('Setting', 'Setting.Model');
-
 class Setting extends CakeTestModel {
     public $displayField = 'key';
 
@@ -28,9 +25,9 @@ class Setting extends CakeTestModel {
 
 class SettingTestCase extends CakeTestCase {
 
-    public $fixtures = array('plugin.Setting.setting');
+    public $fixtures = array('plugin.setting.setting');
 
-    public function setUp() {
+    public function startTest() {
         $this->_cacheDisable = Configure::read('Cache.disable');
         Configure::write('Cache.disable', false);
         $this->_defaultCacheConfig = Cache::config('default');
@@ -40,7 +37,7 @@ class SettingTestCase extends CakeTestCase {
         Configure::write('Setting.prefix', 'test');
     }
 
-    public function tearDown() {
+    public function endTest() {
         Cache::delete('test' . 'Setting.cache');
         Cache::clear();
         Configure::write('Cache.disable', $this->_cacheDisable);

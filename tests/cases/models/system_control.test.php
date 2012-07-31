@@ -1,7 +1,4 @@
 <?php
-App::uses('Cache', 'Cache');
-App::uses('SystemControl', 'Setting.Model');
-
 class SystemControl extends CakeTestModel {
     public $displayField = 'key';
 
@@ -33,19 +30,18 @@ class SystemControl extends CakeTestModel {
  */
 class SystemControlTestCase extends CakeTestCase {
 
-    public $fixtures = array('plugin.Setting.system_control');
+    public $fixtures = array('plugin.setting.system_control');
 
-    public function setUp() {
+    public function startTest() {
         $this->_cacheDisable = Configure::read('Cache.disable');
         Configure::write('Cache.disable', false);
         $this->_defaultCacheConfig = Cache::config('default');
         Cache::config('default', array('engine' => 'File', 'path' => TMP . 'tests'));
-
         $this->SystemControl = new SystemControl();
         Configure::write('Setting.prefix', 'test');
     }
 
-    public function tearDown() {
+    public function endTest() {
         Cache::delete('test' . 'Setting.cache');
         Cache::clear();
         Configure::write('Cache.disable', $this->_cacheDisable);

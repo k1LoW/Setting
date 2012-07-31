@@ -7,7 +7,7 @@ class DATABASE_CONFIG {
         switch ($db) {
         case 'pgsql':
             $this->default = $this->test = array(
-                                                 'datasource' => 'Database/Postgres',
+                                                 'driver' => 'postgres',
                                                  'persistent' => false,
                                                  'host' => '127.0.0.1',
                                                  'login' => 'postgres',
@@ -20,14 +20,13 @@ class DATABASE_CONFIG {
         case 'mysql':
         default:
             $this->default = $this->test = array(
-                                                 'datasource' => 'Database/Mysql',
+                                                 'driver' => 'mysql',
                                                  'persistent' => false,
                                                  'host' => '0.0.0.0',
                                                  'login' => 'root',
                                                  'password' => '',
                                                  'database' => 'cakephp_test',
-                                                 'prefix' => '',
-                                                 'encoding' => 'utf8'
+                                                 'prefix' => ''
                                                  );
 
         }
