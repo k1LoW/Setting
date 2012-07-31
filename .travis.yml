@@ -6,12 +6,14 @@ php:
 
 env:
   - DB=mysql
+  - DB=pgsql
 
 before_script:
   - mkdir -p ./plugins/setting
   - mv models ./plugins/setting/
   - mv tests ./plugins/setting/
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test;'; fi"
+  - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'CREATE DATABASE cakephp_test;' -U postgres; fi"
   - wget https://github.com/cakephp/cakephp/tarball/1.3.15 -O cake.tar.gz
   - tar xf cake.tar.gz
   - mv cakephp-cakephp-* ./cakephp
