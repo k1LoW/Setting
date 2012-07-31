@@ -19,6 +19,11 @@ before_script:
   - wget http://downloads.sourceforge.net/simpletest/simpletest_1.0.1.tar.gz -O simpletest.tar.gz
   - tar xf simpletest.tar.gz
   - mv simpletest/ ./cakephp/app/vendors/
+  - echo "<?php
+    App::build(array(
+    'plugins' => array('/home/vagrant/builds/k1LoW/Setting/plugins/'),
+    ));
+    " > cakephp/app/config/bootstrap.php
   - mv ./plugins/setting/tests/database.php cakephp/app/config/database.php
   - cd ./cakephp
 
