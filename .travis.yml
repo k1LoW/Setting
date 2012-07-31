@@ -9,7 +9,6 @@ env:
 
 before_script:
   - mkdir -p ./plugins/setting
-  - mv libs ./plugins/setting/
   - mv models ./plugins/setting/
   - mv tests ./plugins/setting/
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test;'; fi"
