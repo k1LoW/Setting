@@ -1,14 +1,16 @@
 # Setting: Database driven setting plugin for CakePHP.
 
-[![Build Status](https://secure.travis-ci.org/k1LoW/Setting.png?branch=master)](http://travis-ci.org/k1LoW/Setting)
+[![Build Status](https://secure.travis-ci.org/k1LoW/Setting.png?branch=1.3x)](http://travis-ci.org/k1LoW/Setting)
 
 ## Install
 
-First, Install 'Setting' by [recipe.php](https://github.com/k1LoW/recipe) , and set `CakePlugin::load('Setting', array('bootstrap' => true));`
+First, put `fatty’ directory on app/plugins in your CakePHP application.add add the following code in bootstrap.php.
+
+    App::import('Model', 'Setting.Setting');
 
 Second, Create schema.
 
-    ./lib/Console/cake schema create settings --plugin Setting
+    cake schema create -plugin setting -name settings
 
 ## Usage
 
@@ -31,7 +33,7 @@ Configure `Setting.settings` like Model::validate.
 
 ## If you want not to use Setting (settings table)
 
-See [SystemControlTest.php](https://github.com/k1LoW/Setting/blob/master/Test/Case/Model/SystemControlTest.php).
+See [system_control.test.php](https://github.com/k1LoW/Setting/blob/1.3x/tests/cases/models/system_control.test.php).
 
 ## License
 
