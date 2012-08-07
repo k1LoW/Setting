@@ -117,28 +117,9 @@ class SettableBehavior extends ModelBehavior {
         $settings = Configure::read('Setting.settings');
         $prefix = Configure::read('Setting.prefix');
         if ($key === null) {
-            $keys = array_keys($settings);
-            $s = $model->find('all', array('conditions' => array("{$model->alias}.key" => $keys)));
-            if (empty($s)) {
-                $result = array_combine(array_keys($settings), array_fill(0, count($settings), null));
-                foreach ($result as $key => $value) {
-                    if (array_key_exists('default', $settings[$key])) {
-                        $result[$key] = (string)$settings[$key]['default'];
-                        self::setSetting($model, $key, $settings[$key]['default']);
-                    }
-                }
-                return $result;
-            }
+            $s = $model->find('all', array('conditions' => array("{$model->alias}.key" => array_keys($settings))));
         } else {
-            $keys = array_intersect((array)$key, array_keys($settings));
-            $s = $model->find('all', array('conditions' => array("{$model->alias}.key" => $keys)));
-            if (empty($s)) {
-                if (array_key_exists('default', $settings[$key])) {
-                    self::setSetting($model, $key, $settings[$key]['default']);
-                    return (string)$settings[$key]['default'];
-                }
-                return null;
-            }
+            $s = $model->find('all', array('conditions' => array("{$model->alias}.key" => array_intersect((array)$key, array_keys($settings)))));
         }
         $keys = array();
         foreach ($s as $d) {

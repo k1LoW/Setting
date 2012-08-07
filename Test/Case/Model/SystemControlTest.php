@@ -90,7 +90,7 @@ class SystemControlTestCase extends CakeTestCase {
                                                    'tax_flg' => array('rule' => '/^[01]$/'),
                                                    ));
         $result = SystemControl::setSetting(array('tax_rate' => 0.05,
-                                            'tax_flg' => 1));
+                                                  'tax_flg' => 1));
         $this->assertTrue($result);
 
         $result = SystemControl::getSetting('tax_rate');
@@ -236,7 +236,7 @@ class SystemControlTestCase extends CakeTestCase {
         $this->assertIdentical($result, '0.05');
     }
 
-        /**
+    /**
      * testGetSettingDefaultMulti
      *
      * jpn: 複数の値をセットしたときどの場合でもdefault値を取得できる
