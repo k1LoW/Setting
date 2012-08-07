@@ -235,4 +235,44 @@ class SystemControlTestCase extends CakeTestCase {
         $result = SystemControl::getSetting('tax_rate');
         $this->assertIdentical($result, '0.05');
     }
+
+        /**
+     * testGetSettingDefaultMulti
+     *
+     * jpn: 複数の値をセットしたときどの場合でもdefault値を取得できる
+     */
+    public function testGetSettingDefaultMulti(){
+        Configure::write('Setting.settings', array(
+                                                   'tax_rate' => array('rule' => array('numeric'),
+                                                                       'default' => 0.03),
+                                                   'tax_flg' => array('rule' => '/^[01]$/'),
+                                                   'tax_label' => array('rule' => array('notEmpty'),
+                                                                        'default' => 'TAX'),
+                                                   ));
+        $result = SystemControl::getSetting('tax_rate');
+        $this->assertIdentical($result, '0.03');
+
+        // jpn: DBを直接操作して、一部のデータとキャッシュを削除
+        $setting = $this->SystemControl->find('first', array('conditions' => array('SystemControl.key' => 'tax_label')));
+        $this->SystemControl->delete($setting['SystemControl']['id']);
+        Cache::delete('test' . 'Setting.cache');
+        Cache::clear();
+
+        // jpn: defaultが存在するときはnullでなくdefaultの値を返す
+        $result = SystemControl::getSetting('tax_label');
+        $this->assertIdentical($result, 'TAX');
+
+        // jpn: DBを直接操作して、一部のデータとキャッシュを削除
+        $setting = $this->SystemControl->find('first', array('conditions' => array('SystemControl.key' => 'tax_label')));
+        $this->SystemControl->delete($setting['SystemControl']['id']);
+        Cache::delete('test' . 'Setting.cache');
+        Cache::clear();
+
+        // jpn: SystemControl::getSetting() の場合でもdefaultが存在するときはnullでなくdefaultの値を返す
+        $result = SystemControl::getSetting();
+        $expect = array('tax_rate' => '0.03',
+                        'tax_flg' => null,
+                        'tax_label' => 'TAX');
+        $this->assertIdentical($result, $expect);
+    }
 }
