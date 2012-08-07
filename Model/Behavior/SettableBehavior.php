@@ -32,7 +32,8 @@ class SettableBehavior extends ModelBehavior {
             return $setting->getSettingFromDatasource($key);
         }
         $cache = Cache::read($prefix . 'Setting.cache');
-        if ($cache === false) {
+        if ($cache === false || in_array(null, $cache)) {
+            Cache::delete($prefix . 'Setting.cache');
             $setting = $model;
             Cache::write($prefix . 'Setting.cache', $setting->getSettingFromDatasource());
             $cache = Cache::read($prefix . 'Setting.cache');
@@ -44,7 +45,7 @@ class SettableBehavior extends ModelBehavior {
             } else {
                 $keys = array();
                 foreach (array_intersect((array)$key, array_keys($settings)) as $k) {
-                    if (!array_key_exists($k, $cache)) {
+                    if (!array_key_exists($k, $cache) || $cache[$k] === null) {
                         $setting = $model;
                         return $setting->getSettingFromDatasource($key);
                     }
@@ -116,7 +117,8 @@ class SettableBehavior extends ModelBehavior {
         $settings = Configure::read('Setting.settings');
         $prefix = Configure::read('Setting.prefix');
         if ($key === null) {
-            $s = $model->find('all');
+            $keys = array_keys($settings);
+            $s = $model->find('all', array('conditions' => array("{$model->alias}.key" => $keys)));
             if (empty($s)) {
                 $result = array_combine(array_keys($settings), array_fill(0, count($settings), null));
                 foreach ($result as $key => $value) {
@@ -141,6 +143,14 @@ class SettableBehavior extends ModelBehavior {
         $keys = array();
         foreach ($s as $d) {
             $keys[$d[$model->alias]['key']] = $d[$model->alias]['value'];
+        }
+        if (count($keys) !== count($settings)) {
+            foreach ($settings as $k => $v) {
+                if (!array_key_exists($k, $keys) && array_key_exists('default', $settings[$k])) {
+                    $keys[$k] = (string)$settings[$k]['default'];
+                    self::setSetting($model, $k, $settings[$k]['default']);
+                }
+            }
         }
         if ($key !== null && count($keys) === 1) {
             return array_shift($keys);
