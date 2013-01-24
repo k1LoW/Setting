@@ -6,8 +6,8 @@ php:
 
 env:
   - DB=mysql CAKEPHP=2.1.5
-  - DB=mysql CAKEPHP=2.2.1
-  - DB=pgsql CAKEPHP=2.2.1
+  - DB=mysql CAKEPHP=2.2.5
+  - DB=pgsql CAKEPHP=2.2.5
 
 before_script:
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'DROP DATABASE IF EXISTS cakephp_test;'; fi"

@@ -8,7 +8,7 @@ First, Install 'Setting' by [recipe.php](https://github.com/k1LoW/recipe) , and 
 
 Second, Create schema.
 
-    ./lib/Console/cake schema create settings --plugin Setting
+    ./lib/Cake/Console/cake schema create settings --plugin Setting
 
 ## Usage
 
