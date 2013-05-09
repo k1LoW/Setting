@@ -70,8 +70,8 @@ class SystemControlTestCase extends CakeTestCase {
      */
     public function testSetSetting(){
         Configure::write('Setting.settings', array(
-                                                   'tax_rate' => array('rule' => array('numeric')),
-                                                   ));
+                'tax_rate' => array('rule' => array('numeric')),
+            ));
         $result = SystemControl::setSetting('tax_rate', 0.05);
         $this->assertTrue($result);
 
@@ -86,11 +86,12 @@ class SystemControlTestCase extends CakeTestCase {
      */
     public function testSetSettingMulti(){
         Configure::write('Setting.settings', array(
-                                                   'tax_rate' => array('rule' => array('numeric')),
-                                                   'tax_flg' => array('rule' => '/^[01]$/'),
-                                                   ));
-        $result = SystemControl::setSetting(array('tax_rate' => 0.05,
-                                                  'tax_flg' => 1));
+                'tax_rate' => array('rule' => array('numeric')),
+                'tax_flg' => array('rule' => '/^[01]$/'),
+            ));
+        $result = SystemControl::setSetting(array(
+                'tax_rate' => 0.05,
+                'tax_flg' => 1));
         $this->assertTrue($result);
 
         $result = SystemControl::getSetting('tax_rate');
@@ -107,8 +108,8 @@ class SystemControlTestCase extends CakeTestCase {
      */
     public function testInvalidKeySetSetting(){
         Configure::write('Setting.settings', array(
-                                                   'tax_rate' => array('rule' => array('numeric')),
-                                                   ));
+                'tax_rate' => array('rule' => array('numeric')),
+            ));
         $result = SystemControl::setSetting('invalid_key', 0.05);
         $this->assertFalse($result);
     }
@@ -120,8 +121,8 @@ class SystemControlTestCase extends CakeTestCase {
      */
     public function testInvalidValueSetSetting(){
         Configure::write('Setting.settings', array(
-                                                   'tax_rate' => array('rule' => array('numeric')),
-                                                   ));
+                'tax_rate' => array('rule' => array('numeric')),
+            ));
         $result = SystemControl::setSetting('tax_rate', 'invalid_value');
         $this->assertFalse($result);
     }
@@ -133,8 +134,8 @@ class SystemControlTestCase extends CakeTestCase {
      */
     public function testGetSettingFromCache(){
         Configure::write('Setting.settings', array(
-                                                   'tax_rate' => array('rule' => array('numeric')),
-                                                   ));
+                'tax_rate' => array('rule' => array('numeric')),
+            ));
         $result = SystemControl::setSetting('tax_rate', 0.05);
         $this->assertTrue($result);
 
@@ -164,8 +165,8 @@ class SystemControlTestCase extends CakeTestCase {
      */
     public function testGetSettingFromDatasource(){
         Configure::write('Setting.settings', array(
-                                                   'tax_rate' => array('rule' => array('numeric')),
-                                                   ));
+                'tax_rate' => array('rule' => array('numeric')),
+            ));
         SystemControl::setSetting('tax_rate', 0.05);
 
         // jpn: DB側の値を直接変更してしまう(本来はしない処理)
@@ -187,20 +188,20 @@ class SystemControlTestCase extends CakeTestCase {
      */
     public function testGetSettingAll(){
         Configure::write('Setting.settings', array(
-                                                   'tax_rate' => array('rule' => array('numeric')),
-                                                   'tax_flg' => array('rule' => '/^[01]$/'),
-                                                   ));
+                'tax_rate' => array('rule' => array('numeric')),
+                'tax_flg' => array('rule' => '/^[01]$/'),
+            ));
         // jpn: keyに対してvalueがない場合はnullを返す
         $result = SystemControl::getSetting();
         $expect = array('tax_rate' => null,
-                        'tax_flg' => null);
+            'tax_flg' => null);
         $this->assertIdentical($result, $expect);
 
         $result = SystemControl::setSetting('tax_rate', 0.05);
         $this->assertTrue($result);
         $result = SystemControl::getSetting();
         $expect = array('tax_rate' => '0.05',
-                        'tax_flg' => null);
+            'tax_flg' => null);
         $this->assertIdentical($result, $expect);
 
         $result = SystemControl::setSetting('tax_flg', true);
@@ -208,7 +209,7 @@ class SystemControlTestCase extends CakeTestCase {
 
         $result = SystemControl::getSetting();
         $expect = array('tax_rate' => '0.05',
-                        'tax_flg' => '1');
+            'tax_flg' => '1');
         $this->assertIdentical($result, $expect);
     }
 
@@ -221,9 +222,9 @@ class SystemControlTestCase extends CakeTestCase {
      */
     public function testGetSettingDefault(){
         Configure::write('Setting.settings', array(
-                                                   'tax_rate' => array('rule' => array('numeric'),
-                                                                       'default' => 0.03),
-                                                   ));
+                'tax_rate' => array('rule' => array('numeric'),
+                    'default' => 0.03),
+            ));
         $result = SystemControl::getSetting('tax_rate');
         $this->assertIdentical($result, '0.03');
         $result = SystemControl::setSetting('tax_rate', 0.05);
@@ -243,12 +244,12 @@ class SystemControlTestCase extends CakeTestCase {
      */
     public function testGetSettingDefaultMulti(){
         Configure::write('Setting.settings', array(
-                                                   'tax_rate' => array('rule' => array('numeric'),
-                                                                       'default' => 0.03),
-                                                   'tax_flg' => array('rule' => '/^[01]$/'),
-                                                   'tax_label' => array('rule' => array('notEmpty'),
-                                                                        'default' => 'TAX'),
-                                                   ));
+                'tax_rate' => array('rule' => array('numeric'),
+                    'default' => 0.03),
+                'tax_flg' => array('rule' => '/^[01]$/'),
+                'tax_label' => array('rule' => array('notEmpty'),
+                    'default' => 'TAX'),
+            ));
         $result = SystemControl::getSetting('tax_rate');
         $this->assertIdentical($result, '0.03');
 
@@ -270,9 +271,10 @@ class SystemControlTestCase extends CakeTestCase {
 
         // jpn: SystemControl::getSetting() の場合でもdefaultが存在するときはnullでなくdefaultの値を返す
         $result = SystemControl::getSetting();
-        $expect = array('tax_rate' => '0.03',
-                        'tax_flg' => null,
-                        'tax_label' => 'TAX');
+        $expect = array(
+            'tax_rate' => '0.03',
+            'tax_flg' => null,
+            'tax_label' => 'TAX');
         $this->assertIdentical($result, $expect);
     }
 }
