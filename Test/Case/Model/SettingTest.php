@@ -34,8 +34,11 @@ class SettingTestCase extends CakeTestCase {
         $this->_cacheDisable = Configure::read('Cache.disable');
         Configure::write('Cache.disable', false);
         $this->_defaultCacheConfig = Cache::config('default');
-        Cache::config('default', array('engine' => 'File', 'path' => TMP . 'tests'));
-
+        Cache::config('default', array(
+                'engine' => 'File',
+                'path' => TMP . 'tests' . DS,
+                'mask' => 0666,
+            ));
         $this->Setting = new Setting();
         Configure::write('Setting.prefix', 'test');
     }
@@ -43,6 +46,7 @@ class SettingTestCase extends CakeTestCase {
     public function tearDown() {
         Cache::delete('test' . 'Setting.cache');
         Cache::clear();
+        @unlink(TMP . 'tests' . DS . 'cake_test_setting_cache');
         Configure::write('Cache.disable', $this->_cacheDisable);
         Cache::config('default', $this->_defaultCacheConfig['settings']);
     }
@@ -96,6 +100,26 @@ class SettingTestCase extends CakeTestCase {
     }
 
     /**
+     * testSetSettingValidation
+     *
+     * jpn: 設定は設定しようとしたもののみをバリデーションチェックする
+     */
+    public function testSetSettingValidation(){
+        Configure::write('Setting.settings', array(
+                'tax_rate' => array(
+                    'rule' => array('numeric'),
+                    'allowEmpty' => false,
+                ),
+                'tax_flg' => array(
+                    'rule' => '/^[01]$/',
+                    'allowEmpty' => false,
+                ),
+            ));
+        $result = Setting::setSetting('tax_rate', 0.05);
+        $this->assertTrue($result);
+    }
+
+    /**
      * testInvalidKeySetSetting
      *
      * jpn: Setting.settingsで設定していないキーの設定はfalse
@@ -103,6 +127,7 @@ class SettingTestCase extends CakeTestCase {
     public function testInvalidKeySetSetting(){
         Configure::write('Setting.settings', array(
                                                    'tax_rate' => array('rule' => array('numeric')),
+                                                   'tax_flg' => array('rule' => '/^[01]$/'),
                                                    ));
         $result = Setting::setSetting('invalid_key', 0.05);
         $this->assertFalse($result);
@@ -116,6 +141,7 @@ class SettingTestCase extends CakeTestCase {
     public function testInvalidValueSetSetting(){
         Configure::write('Setting.settings', array(
                                                    'tax_rate' => array('rule' => array('numeric')),
+                                                   'tax_flg' => array('rule' => '/^[01]$/'),
                                                    ));
         $result = Setting::setSetting('tax_rate', 'invalid_value');
         $this->assertFalse($result);
@@ -129,9 +155,15 @@ class SettingTestCase extends CakeTestCase {
     public function testGetSettingFromCache(){
         Configure::write('Setting.settings', array(
                                                    'tax_rate' => array('rule' => array('numeric')),
+                                                   'tax_flg' => array('rule' => '/^[01]$/'),
                                                    ));
-        $result = Setting::setSetting('tax_rate', 0.05);
+        $result = Setting::setSetting(array(
+                'tax_rate' => 0.05,
+                'tax_flg' => true,
+            ));
         $this->assertTrue($result);
+
+        $this->assertTrue(file_exists(TMP . 'tests' . DS . 'cake_test_setting_cache'));
 
         // jpn: DB側の値を直接変更してしまう(本来はしない処理)
         $setting = $this->Setting->find('first', array('conditions' => array('Setting.key' => 'tax_rate')));
@@ -160,8 +192,12 @@ class SettingTestCase extends CakeTestCase {
     public function testGetSettingFromDatasource(){
         Configure::write('Setting.settings', array(
                                                    'tax_rate' => array('rule' => array('numeric')),
+                                                   'tax_flg' => array('rule' => '/^[01]$/'),
                                                    ));
-        Setting::setSetting('tax_rate', 0.05);
+        Setting::setSetting(array(
+                'tax_rate' => 0.05,
+                'tax_flg' => true,
+            ));
 
         // jpn: DB側の値を直接変更してしまう(本来はしない処理)
         $setting = $this->Setting->find('first', array('conditions' => array('Setting.key' => 'tax_rate')));
@@ -169,6 +205,9 @@ class SettingTestCase extends CakeTestCase {
         $this->Setting->save($setting);
         $result = $this->Setting->find('first', array('conditions' => array('Setting.key' => 'tax_rate')));
         $this->assertIdentical((float)$result['Setting']['value'], 0.10);
+
+        $result = Setting::getSetting('tax_rate');
+        $this->assertIdentical($result, '0.05');
 
         // jpn: 第2引数を設定し、強引にDBを見に行く
         $result = Setting::getSetting('tax_rate', true);

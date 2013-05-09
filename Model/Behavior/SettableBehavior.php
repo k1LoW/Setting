@@ -18,6 +18,7 @@ class SettableBehavior extends ModelBehavior {
         if (!$setting->setSettingToDatasource($key, $value)) {
             return false;
         }
+        Cache::write($prefix . 'Setting.cache', $setting->getSettingFromDatasource());
         return Cache::write($prefix . 'Setting.cache', $setting->getSettingFromDatasource());
     }
 
@@ -71,15 +72,15 @@ class SettableBehavior extends ModelBehavior {
             $data = array($key => $value);
         }
         $settings = Configure::read('Setting.settings');
-        $model->validate = $settings;
-        $model->set($data);
-        if(!$model->validates()) {
-            return false;
-        }
         foreach ($data as $k => $v) {
             if (!in_array($k, array_keys($settings))) {
                 return false;
             }
+            $model->validate[$k] = $settings[$k];
+        }
+        $model->set($data);
+        if(!$model->validates()) {
+            return false;
         }
         $model->begin();
         foreach ($data as $k => $v) {
