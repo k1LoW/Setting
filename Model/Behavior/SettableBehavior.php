@@ -33,7 +33,7 @@ class SettableBehavior extends ModelBehavior {
             return $setting->getSettingFromDatasource($key);
         }
         $cache = Cache::read($prefix . 'Setting.cache');
-        if ($cache === false || in_array(null, $cache)) {
+        if ($cache === false || empty($cache[$key])) {
             Cache::delete($prefix . 'Setting.cache');
             $setting = $model;
             Cache::write($prefix . 'Setting.cache', $setting->getSettingFromDatasource());
@@ -126,16 +126,16 @@ class SettableBehavior extends ModelBehavior {
         foreach ($s as $d) {
             $keys[$d[$model->alias]['key']] = $d[$model->alias]['value'];
         }
-        if (count($keys) !== count($settings)) {
+        if ($key !== null && count($keys) === 1) {
+            return array_shift($keys);
+        }
+        if ($key === null && count($keys) !== count($settings)) {
             foreach ($settings as $k => $v) {
                 if (!array_key_exists($k, $keys) && array_key_exists('default', $settings[$k])) {
                     $keys[$k] = (string)$settings[$k]['default'];
                     self::setSetting($model, $k, $settings[$k]['default']);
                 }
             }
-        }
-        if ($key !== null && count($keys) === 1) {
-            return array_shift($keys);
         }
         return array_merge(array_combine(array_keys($settings), array_fill(0, count($settings), null)), $keys);
     }

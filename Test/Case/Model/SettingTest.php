@@ -194,10 +194,8 @@ class SettingTestCase extends CakeTestCase {
                 'tax_rate' => array('rule' => array('numeric')),
                 'tax_flg' => array('rule' => '/^[01]$/'),
             ));
-        Setting::setSetting(array(
-                'tax_rate' => 0.05,
-                'tax_flg' => true,
-            ));
+        $result = Setting::setSetting('tax_rate', 0.05);
+        $this->assertTrue($result);
 
         // jpn: DB側の値を直接変更してしまう(本来はしない処理)
         $setting = $this->Setting->find('first', array('conditions' => array('Setting.key' => 'tax_rate')));
@@ -212,6 +210,26 @@ class SettingTestCase extends CakeTestCase {
         // jpn: 第2引数を設定し、強引にDBを見に行く
         $result = Setting::getSetting('tax_rate', true);
         $this->assertIdentical((float)$result, 0.10);
+    }
+
+    /**
+     * testGetSettingFromDatasource
+     *
+     * jpn: Setting::getSetting()の第2引数をtrueにして2番目のデータをDatasourceを優先して参照する
+     */
+    public function testGetSettingFromDatasourceSecond(){
+        Configure::write('Setting.settings', array(
+                'tax_rate' => array('rule' => array('numeric')),
+                'tax_flg' => array('rule' => '/^[01]$/'),
+            ));
+        $result = Setting::setSetting(array(
+                'tax_rate' => 0.05,
+                'tax_flg' => 1,
+            ));
+        $this->assertTrue($result);
+        // jpn: 第2引数を設定し、強引にDBを見に行く
+        $result = Setting::getSetting('tax_flg', true);
+        $this->assertIdentical($result, '1');
     }
 
     /**
