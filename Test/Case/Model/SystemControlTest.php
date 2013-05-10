@@ -39,8 +39,11 @@ class SystemControlTestCase extends CakeTestCase {
         $this->_cacheDisable = Configure::read('Cache.disable');
         Configure::write('Cache.disable', false);
         $this->_defaultCacheConfig = Cache::config('default');
-        Cache::config('default', array('engine' => 'File', 'path' => TMP . 'tests'));
-
+        Cache::config('default', array(
+                'engine' => 'File',
+                'path' => TMP . 'tests' . DS,
+                'mask' => 0666,
+            ));
         $this->SystemControl = new SystemControl();
         Configure::write('Setting.prefix', 'test');
     }
@@ -48,6 +51,7 @@ class SystemControlTestCase extends CakeTestCase {
     public function tearDown() {
         Cache::delete('test' . 'Setting.cache');
         Cache::clear();
+        @unlink(TMP . 'tests' . DS . 'cake_test_setting_cache');
         Configure::write('Cache.disable', $this->_cacheDisable);
         Cache::config('default', $this->_defaultCacheConfig['settings']);
     }
@@ -102,6 +106,26 @@ class SystemControlTestCase extends CakeTestCase {
     }
 
     /**
+     * testSetSettingValidation
+     *
+     * jpn: 設定は設定しようとしたもののみをバリデーションチェックする
+     */
+    public function testSetSettingValidation(){
+        Configure::write('Setting.settings', array(
+                'tax_rate' => array(
+                    'rule' => array('numeric'),
+                    'allowEmpty' => false,
+                ),
+                'tax_flg' => array(
+                    'rule' => '/^[01]$/',
+                    'allowEmpty' => false,
+                ),
+            ));
+        $result = SystemControl::setSetting('tax_rate', 0.05);
+        $this->assertTrue($result);
+    }
+
+    /**
      * testInvalidKeySetSetting
      *
      * jpn: Setting.settingsで設定していないキーの設定はfalse
@@ -109,6 +133,7 @@ class SystemControlTestCase extends CakeTestCase {
     public function testInvalidKeySetSetting(){
         Configure::write('Setting.settings', array(
                 'tax_rate' => array('rule' => array('numeric')),
+                'tax_flg' => array('rule' => '/^[01]$/'),
             ));
         $result = SystemControl::setSetting('invalid_key', 0.05);
         $this->assertFalse($result);
@@ -122,6 +147,7 @@ class SystemControlTestCase extends CakeTestCase {
     public function testInvalidValueSetSetting(){
         Configure::write('Setting.settings', array(
                 'tax_rate' => array('rule' => array('numeric')),
+                'tax_flg' => array('rule' => '/^[01]$/'),
             ));
         $result = SystemControl::setSetting('tax_rate', 'invalid_value');
         $this->assertFalse($result);
@@ -135,9 +161,15 @@ class SystemControlTestCase extends CakeTestCase {
     public function testGetSettingFromCache(){
         Configure::write('Setting.settings', array(
                 'tax_rate' => array('rule' => array('numeric')),
+                'tax_flg' => array('rule' => '/^[01]$/'),
             ));
-        $result = SystemControl::setSetting('tax_rate', 0.05);
+        $result = SystemControl::setSetting(array(
+                'tax_rate' => 0.05,
+                'tax_flg' => true,
+            ));
         $this->assertTrue($result);
+
+        $this->assertTrue(file_exists(TMP . 'tests' . DS . 'cake_test_setting_cache'));
 
         // jpn: DB側の値を直接変更してしまう(本来はしない処理)
         $SystemControl = $this->SystemControl->find('first', array('conditions' => array('SystemControl.key' => 'tax_rate')));
@@ -166,6 +198,7 @@ class SystemControlTestCase extends CakeTestCase {
     public function testGetSettingFromDatasource(){
         Configure::write('Setting.settings', array(
                 'tax_rate' => array('rule' => array('numeric')),
+                'tax_flg' => array('rule' => '/^[01]$/'),
             ));
         SystemControl::setSetting('tax_rate', 0.05);
 
@@ -182,6 +215,26 @@ class SystemControlTestCase extends CakeTestCase {
     }
 
     /**
+     * testGetSettingFromDatasource
+     *
+     * jpn: SystemControl::getSetting()の第2引数をtrueにして2番目のデータをDatasourceを優先して参照する
+     */
+    public function testGetSettingFromDatasourceSecond(){
+        Configure::write('Setting.settings', array(
+                'tax_rate' => array('rule' => array('numeric')),
+                'tax_flg' => array('rule' => '/^[01]$/'),
+            ));
+        $result = SystemControl::setSetting(array(
+                'tax_rate' => 0.05,
+                'tax_flg' => 1,
+            ));
+        $this->assertTrue($result);
+        // jpn: 第2引数を設定し、強引にDBを見に行く
+        $result = SystemControl::getSetting('tax_flg', true);
+        $this->assertIdentical($result, '1');
+    }
+
+    /**
      * testGetSettingAll
      *
      * jpn: SystemControl::getSetting()を引数なしで使用した場合、全ての設定を返す
@@ -193,7 +246,8 @@ class SystemControlTestCase extends CakeTestCase {
             ));
         // jpn: keyに対してvalueがない場合はnullを返す
         $result = SystemControl::getSetting();
-        $expect = array('tax_rate' => null,
+        $expect = array(
+            'tax_rate' => null,
             'tax_flg' => null);
         $this->assertIdentical($result, $expect);
 
@@ -208,7 +262,8 @@ class SystemControlTestCase extends CakeTestCase {
         $this->assertTrue($result);
 
         $result = SystemControl::getSetting();
-        $expect = array('tax_rate' => '0.05',
+        $expect = array(
+            'tax_rate' => '0.05',
             'tax_flg' => '1');
         $this->assertIdentical($result, $expect);
     }

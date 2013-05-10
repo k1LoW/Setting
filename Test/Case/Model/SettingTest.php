@@ -88,7 +88,8 @@ class SettingTestCase extends CakeTestCase {
                 'tax_rate' => array('rule' => array('numeric')),
                 'tax_flg' => array('rule' => '/^[01]$/'),
             ));
-        $result = Setting::setSetting(array('tax_rate' => 0.05,
+        $result = Setting::setSetting(array(
+                'tax_rate' => 0.05,
                 'tax_flg' => 1));
         $this->assertTrue($result);
 
@@ -244,7 +245,8 @@ class SettingTestCase extends CakeTestCase {
             ));
         // jpn: keyに対してvalueがない場合はnullを返す
         $result = Setting::getSetting();
-        $expect = array('tax_rate' => null,
+        $expect = array(
+            'tax_rate' => null,
             'tax_flg' => null);
         $this->assertIdentical($result, $expect);
 
@@ -259,7 +261,8 @@ class SettingTestCase extends CakeTestCase {
         $this->assertTrue($result);
 
         $result = Setting::getSetting();
-        $expect = array('tax_rate' => '0.05',
+        $expect = array(
+            'tax_rate' => '0.05',
             'tax_flg' => '1');
         $this->assertIdentical($result, $expect);
     }
