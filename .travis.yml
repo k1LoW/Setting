@@ -1,13 +1,14 @@
 language: php
 
 php:
-  - 5.2
   - 5.3
+  - 5.4
 
 env:
   - DB=mysql CAKEPHP=2.1.5
   - DB=mysql CAKEPHP=2.2.5
-  - DB=pgsql CAKEPHP=2.2.5
+  - DB=mysql CAKEPHP=2.2.8
+  - DB=mysql CAKEPHP=2.3.4
 
 before_script:
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'DROP DATABASE IF EXISTS cakephp_test;'; fi"
@@ -16,20 +17,40 @@ before_script:
   - wget https://github.com/cakephp/cakephp/tarball/$CAKEPHP -O cake.tar.gz
   - tar xf cake.tar.gz
   - mv cakephp-cakephp-* ./cakephp
+  - mv Test/database.php cakephp/app/Config/database.php
+  - mkdir -p ./cakephp/app/Plugin/Setting
+  - mv Model ./cakephp/app/Plugin/Setting
+  - mv Test ./cakephp/app/Plugin/Setting
+  - mv Config ./cakephp/app/Plugin/Setting
   - chmod -R 777 ./cakephp/app/tmp
   - echo "<?php
-    App::build(array(
-    'Plugin' => array('/home/vagrant/builds/k1LoW/'),
-    ));
     CakePlugin::load('Setting', array('bootstrap' => true));
     " > cakephp/app/Config/bootstrap.php
-  - mv Test/database.php cakephp/app/Config/database.php
+  - echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+    <phpunit bootstrap=\"vendor/autoload.php\">
+    <filter>
+        <blacklist>
+            <directory suffix=\".php\">app/Config</directory>
+            <directory suffix=\".php\">app/Controller</directory>
+            <directory suffix=\".php\">app/Model</directory>
+            <directory suffix=\".php\">app/Test</directory>
+            <directory suffix=\".php\">app/Vendor</directory>
+            <directory suffix=\".php\">app/Plugin/Setting/Test</directory>
+            <directory suffix=\".php\">lib</directory>
+            <directory suffix=\".php\">vendor</directory>
+        </blacklist>
+    </filter>
+    </phpunit>
+    " > cakephp/phpunit.xml.dist
+  - mv coveralls.json cakephp/composer.json
+  - mv .coveralls.yml cakephp/.coveralls.yml
   - cd ./cakephp
+  - curl -s http://getcomposer.org/installer | php
+  - php composer.phar install --dev --no-interaction --prefer-source
+  - mkdir -p build/logs
 
 script:
-  - ./lib/Cake/Console/cake test Setting Model/Setting --stderr
-  - ./lib/Cake/Console/cake test Setting Model/SystemControl --stderr
+  - ./lib/Cake/Console/cake test Setting All --stderr --coverage-clover build/logs/clover.xml --configuration phpunit.xml.dist
 
 after_script:
-  - cd ../
-  - rm -rf *
+  - php vendor/bin/coveralls -v
