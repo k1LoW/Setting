@@ -342,6 +342,25 @@ class SettingTestCase extends CakeTestCase {
     }
 
     /**
+     * testInvalidKeyGetSetting
+     *
+     * jpn: Setting.settingsで設定していないキーの取得はfalse
+     */
+    public function testInvalidKeyGetSetting(){
+        Configure::write('Setting.settings', array(
+                'tax_rate' => array('rule' => array('numeric')),
+                'tax_flg' => array('rule' => '/^[01]$/'),
+            ));
+        $result = Setting::setSetting(array(
+                'tax_rate' => 0.05,
+                'tax_flg' => 1,
+            ));
+        $this->assertTrue($result);
+        $result = Setting::getSetting('invalid_key');
+        $this->assertFalse($result);
+    }
+
+    /**
      * testClearCache
      *
      * jpn: 設定情報のキャッシュを削除する

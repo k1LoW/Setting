@@ -55,7 +55,7 @@ class SettableBehavior extends ModelBehavior {
                 if ($key !== null && count($keys) === 1) {
                     return array_shift($keys);
                 }
-                return $keys;
+                return false;
             }
         }
         return null;
