@@ -1,6 +1,7 @@
 # Setting: Database driven setting plugin for CakePHP.
 
 [![Build Status](https://secure.travis-ci.org/k1LoW/Setting.png?branch=master)](http://travis-ci.org/k1LoW/Setting)
+[![Coverage Status](https://coveralls.io/repos/k1LoW/Setting/badge.png?branch=master)](https://coveralls.io/r/k1LoW/Setting?branch=master)
 
 ## Install
 
