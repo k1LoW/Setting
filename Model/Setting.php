@@ -27,4 +27,13 @@ class Setting extends AppModel {
         $setting = ClassRegistry::init('Setting');
         return SettableBehavior::getSetting($setting, $key, $force);
     }
+
+    /**
+     * clearCache
+     *
+     */
+    public static function clearCache(){
+        $setting = ClassRegistry::init('Setting');
+        return SettableBehavior::clearCache($setting);
+    }
 }

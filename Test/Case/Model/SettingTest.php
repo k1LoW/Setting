@@ -24,6 +24,15 @@ class Setting extends CakeTestModel {
         $setting = ClassRegistry::init('Setting');
         return SettableBehavior::getSetting($setting, $key, $force);
     }
+
+    /**
+     * clearCache
+     *
+     */
+    public static function clearCache(){
+        $setting = ClassRegistry::init('Setting');
+        return SettableBehavior::clearCache($setting);
+    }
 }
 
 class SettingTestCase extends CakeTestCase {
@@ -276,7 +285,8 @@ class SettingTestCase extends CakeTestCase {
      */
     public function testGetSettingDefault(){
         Configure::write('Setting.settings', array(
-                'tax_rate' => array('rule' => array('numeric'),
+                'tax_rate' => array(
+                    'rule' => array('numeric'),
                     'default' => 0.03),
             ));
         $result = Setting::getSetting('tax_rate');
@@ -329,5 +339,42 @@ class SettingTestCase extends CakeTestCase {
             'tax_flg' => null,
             'tax_label' => 'TAX');
         $this->assertIdentical($result, $expect);
+    }
+
+    /**
+     * testClearCache
+     *
+     * jpn: 設定情報のキャッシュを削除する
+     */
+    public function testClearCache(){
+        Configure::write('Setting.settings', array(
+                'tax_rate' => array('rule' => array('numeric')),
+                'tax_flg' => array('rule' => '/^[01]$/'),
+            ));
+        $result = Setting::setSetting(array(
+                'tax_rate' => 0.05,
+                'tax_flg' => true,
+            ));
+        $this->assertTrue($result);
+
+        $this->assertTrue(file_exists(TMP . 'tests' . DS . 'cake_test_setting_cache'));
+
+        // jpn: DB側の値を直接変更してしまう(本来はしない処理)
+        $setting = $this->Setting->find('first', array('conditions' => array('Setting.key' => 'tax_rate')));
+        $setting['Setting']['value'] = 0.10;
+        $this->Setting->save($setting);
+        $result = $this->Setting->find('first', array('conditions' => array('Setting.key' => 'tax_rate')));
+        $this->assertIdentical((float)$result['Setting']['value'], 0.10);
+
+        // jpn: キャッシュを見ているので元の値を出力する
+        $result = Setting::getSetting('tax_rate');
+        $this->assertIdentical($result, '0.05');
+
+        // jpn: キャッシュをクリア
+        $result = Setting::clearCache();
+
+        // jpn: キャッシュがないのでDBを見に行く
+        $result = Setting::getSetting('tax_rate');
+        $this->assertIdentical((float)$result, 0.10);
     }
 }

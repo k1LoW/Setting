@@ -1,7 +1,7 @@
 <?php
 
 /**
- *
+ * SettableBehavior
  *
  *
  * @params
@@ -34,8 +34,8 @@ class SettableBehavior extends ModelBehavior {
         }
         $cache = Cache::read($prefix . 'Setting.cache');
         if ($cache === false || empty($cache[$key])) {
-            Cache::delete($prefix . 'Setting.cache');
             $setting = $model;
+            self::clearCache($model);
             Cache::write($prefix . 'Setting.cache', $setting->getSettingFromDatasource());
             $cache = Cache::read($prefix . 'Setting.cache');
         }
@@ -141,22 +141,11 @@ class SettableBehavior extends ModelBehavior {
     }
 
     /**
-     * deleteSetting
+     * clearCache
      *
-     * @param $key
      */
-    public function deleteSetting(Model $model, $key){
-        $keys = array_intersect((array)$key, array_keys($settings));
-        $s = $model->find('all', array('conditions' => array("{$model->alias}.key" => $keys)));
-        if (empty($s)) {
-            return true;
-        }
-        foreach ($s as $d) {
-            if (!$model->delete($d[$model->alias]['id'])) {
-                return false;
-            }
-        }
-        return true;
+    public function clearCache(Model $model){
+        $prefix = Configure::read('Setting.prefix');
+        return Cache::delete($prefix . 'Setting.cache');
     }
-
 }
