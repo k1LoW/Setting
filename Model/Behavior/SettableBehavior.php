@@ -144,7 +144,7 @@ class SettableBehavior extends ModelBehavior {
      * clearCache
      *
      */
-    public function clearCache(Model $model){
+    public static function clearCache(Model $model){
         $prefix = Configure::read('Setting.prefix');
         return Cache::delete($prefix . 'Setting.cache');
     }
