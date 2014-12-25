@@ -45,6 +45,7 @@ class SettingTestCase extends CakeTestCase {
         $this->_defaultCacheConfig = Cache::config('default');
         Cache::config('default', array(
                 'engine' => 'File',
+                'prefix' => 'cake_',
                 'path' => TMP . 'tests' . DS,
                 'mask' => 0666,
             ));
