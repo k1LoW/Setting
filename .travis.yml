@@ -3,14 +3,15 @@ language: php
 php:
   - 5.3
   - 5.4
+  - 5.5
 
 env:
-  - DB=mysql CAKEPHP=2.1.5
-  - DB=mysql CAKEPHP=2.2.5
-  - DB=mysql CAKEPHP=2.2.8
-  - DB=mysql CAKEPHP=2.3.5
+  - DB=mysql CAKEPHP=2.4.10
+  - DB=mysql CAKEPHP=2.5.7
+  - DB=mysql CAKEPHP=2.6.0
 
 before_script:
+  - composer install --dev
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'DROP DATABASE IF EXISTS cakephp_test;'; fi"
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'CREATE DATABASE cakephp_test;'; fi"
   - sh -c "if [ '$DB' = 'pgsql' ]; then psql -c 'CREATE DATABASE cakephp_test;' -U postgres; fi"
@@ -25,6 +26,7 @@ before_script:
   - chmod -R 777 ./cakephp/app/tmp
   - echo "<?php
     CakePlugin::load('Setting', array('bootstrap' => true));
+    ini_set('include_path',  '/home/travis/build/k1LoW/Setting/vendor/phpunit/phpunit' . PATH_SEPARATOR . ini_get('include_path'));
     " > cakephp/app/Config/bootstrap.php
   - echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     <phpunit bootstrap=\"vendor/autoload.php\">
@@ -45,8 +47,7 @@ before_script:
   - mv coveralls.json cakephp/composer.json
   - mv .coveralls.yml cakephp/.coveralls.yml
   - cd ./cakephp
-  - curl -s http://getcomposer.org/installer | php
-  - php composer.phar install --dev --no-interaction --prefer-source
+  - composer install --dev --no-interaction --prefer-source
   - mkdir -p build/logs
 
 script:
